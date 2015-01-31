@@ -9,6 +9,7 @@ case object Nil extends List[Nothing]
 case class Cons[+A](head: A, tail: List[A]) extends List[A]
 
 object List {
+
   def sum(ints: List[Int]): Int = ints match {
     case Nil         => 0
     case Cons(x, xs) => x + sum(xs)
@@ -78,13 +79,46 @@ object List {
     case Cons(x, xs) => foldLeft(xs, f(z, x))(f)
   }
   
-  // Exercise 3.11: sum, produce & list.length using foldLeft
+  // Exercise 3.11: sum, product & list.length using foldLeft
   def sumLeft(as: List[Int]): Int = foldLeft(as, 0)(_ + _)
 
   def productLeft(ds: List[Double]): Double = foldLeft(ds, 1.0)(_ * _)
   
-  def length[A](as: List[A]): Int = foldLeft(as, 0)((acc,h) => acc + 1)
+  def lengthViaFL[A](as: List[A]): Int = foldLeft(as, 0)((acc,h) => acc + 1)
   
   // Exercise 3.12
   def reverse[A](as: List[A]): List[A] = foldLeft(as, Nil: List[A])((acc, h) => Cons(h, acc))
+  
+  // Exercise 3.13
+  def foldLeftViaFR[A,B](as: List[A], z: B)(f: (B, A) => B): B = {
+    foldRight(as, z)((a: A, b: B) => f(b, a)) // FIXME
+  }
+  
+  // Exercise 3.14
+  def appendViaFR[A](l: List[A], r: List[A]): List[A] = {
+    foldRight(l, r)(Cons(_,_))
+  }
+  
+  // Exercise 3.15
+  def concat[A](lists: List[List[A]]): List[A] = {
+    foldLeft(lists, Nil: List[A])((r: List[A], l: List[A]) => List.appendViaFR(r, l))
+  }
+  
+  // Exercise 3.16 - 18
+  def map[A,B](l: List[A])(f: A => B): List[B] = l match {
+    case Nil       => Nil
+    case Cons(h,t) => Cons(f(h), map(t)(f))
+  }
+  
+  // Exercise 3.19
+  def filter[A](l: List[A])(f: A => Boolean): List[A] = l match {
+    case Nil       => Nil
+    case Cons(h,t) => if (f(h)) Cons(h, filter(t)(f)) else filter(t)(f)
+  }
+  
+  // Exercise 3.20
+  def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] = as match {
+    case Nil => Nil
+    case Cons(h,t) => concat(List(f(h), flatMap(t)(f)))
+  }
 }
