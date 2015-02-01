@@ -121,4 +121,31 @@ object List {
     case Nil => Nil
     case Cons(h,t) => concat(List(f(h), flatMap(t)(f)))
   }
+  
+  // Exercise 3.21
+  def filterViaFM[A](l: List[A])(f: A => Boolean): List[A] = {
+    flatMap(l)((a: A) => if (f(a)) List(a) else Nil)
+  }
+  
+  // Exercise 3.22 & 3.23
+  def zipWith[A,B,C](l1: List[A], l2: List[B])(f: (A,B) => C): List[C] = (l1, l2) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(h1,t1), Cons(h2,t2)) => Cons(f(h1,h2), zipWith(t1,t2)(f))
+  }
+  
+  // Exercise 3.24
+  def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = {
+    
+    def hasStart[A](sup: List[A], sub: List[A]): Boolean = (sup, sub) match {
+      case (Nil, _) => false
+      case (_, Nil) => false
+      case (Cons(h1,t1),Cons(h2,t2)) => h1 == h2 && hasStart(t1, t2)
+    }
+    
+    sup match {
+      case Cons(h,t) if hasStart(sup, sub) => true
+      case Cons(h,t) => hasSubsequence(t, sub)
+    }
+  }
 }

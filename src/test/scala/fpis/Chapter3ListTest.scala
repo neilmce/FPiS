@@ -44,4 +44,26 @@ class Chapter3ListTest extends FlatSpec {
   "A List" should "be flatmappable" in {
     assert(List.flatMap(List(1,2,3))(i => List(i,i)) === List(1,1,2,2,3,3))
   }
+  
+  // Exercise 3.21. filter via flatMap
+  "A List" should "be filterableViaFlatMap" in {
+    val l = List(1,2,3,4,5)
+    assert(List.filterViaFM(l)(_ % 2 == 0) === List(2,4))
+  }
+  
+  // Exercise 3.22 & 3.23 zip
+  "Lists" should "be zippable" in {
+    val l1 = List(1,2,3)
+    val l2 = List(4,5,6)
+    assert(List.zipWith(l1, l2)(_ + _) === List(5,7,9))
+  }
+  
+  // Exercise 3.24
+  "Lists" should "be searchable for subsequences" in {
+    val l = List(1,2,3,4)
+    assert(List.hasSubsequence(l, List(1,2)) === true)
+    assert(List.hasSubsequence(l, List(2,3)) === true)
+    assert(List.hasSubsequence(l, List(4)) === true)
+    assert(List.hasSubsequence(l, List(1,2,3,4,5)) === false)
+  }
 }
