@@ -1,4 +1,4 @@
-package fpis
+package fpis.chap2to3
 
 import org.scalatest.FlatSpec
 

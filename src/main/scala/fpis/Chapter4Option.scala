@@ -10,8 +10,8 @@ sealed trait Option[+A] {
   def flatMap[B](f: A => Option[B]): Option[B] = {
     map(f).getOrElse(None)
   }
-  
-  def getOrElse[B >: A](default: => B): B = {
+
+  def getOrElse[B>:A](default: => B): B = this match {
     case None => default
     case Some(a) => a
   }
@@ -27,3 +27,37 @@ sealed trait Option[+A] {
 
 case class  Some[+A](get: A) extends Option[A]
 case object None             extends Option[Nothing]
+
+
+object Exercises {
+  def variance(xs: Seq[Double]): Option[Double] = {
+    
+    def mean(nums: Seq[Double]): Option[Double] = if (nums.isEmpty) None else Some(nums.foldRight(0.0)(_ + _) / nums.size)
+    
+    mean(xs) flatMap (m => mean(xs.map(x => math.pow(x - m, 2))))
+  }
+
+  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = {
+    a.flatMap(aval => b.map(bval => f(aval, bval)))
+  }
+
+  def insuranceRateQuote(age: Int, numberOfSpeedingTickets: Int): Double = age * numberOfSpeedingTickets
+  
+  def Try[A](a: => A): Option[A] = {
+    try Some(a)
+    catch { case e: Exception => None }
+  }
+  
+  def parseInsuranceRateQuote(age: String, numberOfSpeedingTickets: String): Option[Double] = {
+    val optAge:     Option[Int] = Try { age.toInt }
+    val optTickets: Option[Int] = Try { numberOfSpeedingTickets.toInt }
+    
+    map2(optAge, optTickets)(insuranceRateQuote)
+  }
+  
+  /** Converts a list. If a contains even one None, the result is None, else Some(List(answers)) */
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = a match {
+    case Nil => Some(Nil)
+    case h::t => h.flatMap(hh => sequence(t).map(hh :: _))
+  }
+}

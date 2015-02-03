@@ -1,4 +1,4 @@
-package fpis
+package fpis.chap2to3
 
 /** Exercises for Chapter 3 of FPinS. */
 sealed trait Tree[+A]
