@@ -15,6 +15,8 @@ case class SimpleRNG(seed: Long) extends RNG {
 }
 
 object StateExercises {
+  def int(rng: RNG): (Int, RNG) = rng.nextInt
+  
   def nonNegativeInt(rng: RNG): (Int, RNG) = {
     val (n, rng2) = rng.nextInt
     n match {
@@ -51,7 +53,45 @@ object StateExercises {
     if (count == 0) (Nil, rng) else {
       val (i, r) = rng.nextInt
       val (tail, finalR) = ints(count - 1)(r)
-      (tail, finalR) // TODO Is this the final RNG?
+      (i :: tail, finalR)
+    }
+  }
+  
+  // Thought: This RNG is a monad, isn't it? The state monad?
+  
+  // Convenient type alias
+  type Rand[+A] = RNG => (A, RNG)
+  
+  def unit[A](a: A): Rand[A] = rng => (a, rng)
+  
+  def map[A,B](s: Rand[A])(f: A => B): Rand[B] = {
+    rng => {
+      val (a, rng2) = s(rng)
+      (f(a), rng2)
+    }
+  }
+  
+  def doubleViaMap: Rand[Double] = {
+    map(nonNegativeInt)(_.toDouble / (Int.MaxValue + 1))
+  }
+
+  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = {
+    rng => {
+      val (a, r1) = ra(rng)
+      val (b, r2) = rb(r1)
+      (f(a, b), r2)
+    }
+  }
+  
+  // So with map2 we can...
+  def both[A,B](ra: Rand[A], rb: Rand[B]): Rand[(A,B)] = map2(ra, rb)((_, _))
+  
+  // ...and then simplify...
+  def doubleInt2: Rand[(Double,Int)] = both(double, int)
+  
+  // Exercise 6.7. lists of RNGs
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = {
+    rng => {
     }
   }
 }
